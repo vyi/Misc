@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+        <script>
+        
+        
+
+window.onload = function(){
+
+    let xy_values =[];
+    let xy_values2 =[];
+    
+    let len = 99; //Number of points
+    let dt = 8*Math.PI/len; //X-Distance between points
+    
+    for (var i =0; i<len; i++){
+        
+        let valx = i*dt;
+        let valy = Math.sin(valx);
+        
+        if(valy > 0){ 
+            // Positive sine
+            xy_values.push( {key: valx, value: valy} );
+            xy_values2.push( {key: valx, value: 0.0} );
+        }else{
+            //Negative sine
+            xy_values.push( {key: valx, value: 0.0} );
+            xy_values2.push( {key: valx, value: valy} );
+        }
+        
+    }
+    
+    draw(xy_values, xy_values2);
+    
+    }
+    
+function draw(cdata, ddata){
+    
+    var height=200;
+    var width=800;
+    
+    let svg=d3.select("#container").append("svg").attr("width", width).attr("height", height);
+    
+    walkX = d3.scaleLinear()
+        .domain([0, 30])
+        .range([40, width ])
+    
+    walkY = d3.scaleLinear()
+        .domain([-1, 1])
+        .range([height-10, 10])
+    
+
+    
+    // Add the green regions
+    svg.append("path")
+        .datum(cdata)
+        .attr("fill", "#BFB")
+        .attr("stroke", "none")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x(function(d) { return walkX(d.key) })
+            .y(function(d) { return walkY(d.value) })
+        );
+    
+    // Add the red regions    
+    svg.append("path")
+        .datum(ddata)
+        .attr("fill", "#FBB")
+        .attr("stroke", "none")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x(function(d) { return walkX(d.key) })
+            .y(function(d) { return walkY(d.value) })
+        );
+        
+        
+    // Add scatter points
+    svg.append('g')
+    .selectAll("dot")
+    .data(ddata)
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return walkX(d.key); } )
+      .attr("cy", function (d) { return walkY(d.value); } )
+      .attr("r", 1.5)
+      .style("fill", "#69b3a2")
+        
+        
+    svg.append("g")
+        .attr("transform", "translate("+ 0 + "," + 10 + ")")
+        .call(d3.axisBottom(walkX));
+        
+    svg.append("g")
+        .attr("transform", "translate("+ 0 + "," + (height-10) + ")")
+        .call(d3.axisBottom(walkX));
+    
+    svg.append("g")
+        .attr("transform", "translate("+ 0 + "," + (height/2) + ")")
+        .call(d3.axisBottom(walkX));
+    
+    svg.append("g")
+        .attr("transform", "translate(" + 35 +","+ 0 +")")
+        .call(d3.axisLeft(walkY));
+    
+}
+        
+        </script>
+        
+ 
+    </head>
+ <body>
+
+    <div id="container" class="inner">
+    </div>
+  
+ </body>
+ </html>
